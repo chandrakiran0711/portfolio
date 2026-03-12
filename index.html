@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chandra Kiran Suraparaju — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --amber:#f59e0b;--coral:#e05c1a;--warm-gold:#f0a500;--soft-pink:#ff9a8b;
+  --text-main:#1a2a3a;--text-soft:rgba(20,40,60,0.65);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Quicksand',sans-serif;background:#d6eeff;color:var(--text-main);overflow-x:hidden;cursor:none;}
+a,button{cursor:none;}
+
+/* ══════════════════════════════════════════
+   SCROLL PROGRESS BAR
+══════════════════════════════════════════ */
+#progress-bar{
+  position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,var(--amber),var(--coral),var(--soft-pink));
+  z-index:9999;transition:width .1s linear;
+  box-shadow:0 0 10px rgba(224,92,26,.6),0 0 20px rgba(245,158,11,.4);
+}
+
+/* ══════════════════════════════════════════
+   MAGNETIC CURSOR WITH PARTICLE TRAIL
+══════════════════════════════════════════ */
+#cursor-ring{position:fixed;width:28px;height:28px;border:1.5px solid rgba(224,92,26,0.7);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s,background .25s;}
+#cursor-dot{position:fixed;width:5px;height:5px;background:var(--coral);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 8px var(--amber);}
+#cursor-ring.hovering{width:56px;height:56px;border-color:var(--amber);background:rgba(245,158,11,.08);border-width:2px;}
+#cursor-ring.clicking{width:22px;height:22px;background:rgba(224,92,26,.18);}
+#trail-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997;}
+
+#sky-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+/* ══════════════════════════════════════════
+   ANIMATED MESH BACKGROUND
+══════════════════════════════════════════ */
+#mesh-bg{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(100,180,255,.35) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(255,200,100,.25) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 70% at 50% 80%, rgba(255,150,120,.2) 0%, transparent 60%),
+    #c8e4f8;
+  animation:meshShift 12s ease-in-out infinite alternate;
+}
+@keyframes meshShift{
+  0%{background-position:0% 0%,100% 0%,50% 100%;}
+  50%{background-position:30% 20%,70% 30%,20% 80%;}
+  100%{background-position:10% 40%,90% 10%,60% 90%;}
+}
+
+nav{position:fixed;top:3px;left:0;right:0;z-index:200;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.45);backdrop-filter:blur(22px);border-bottom:1px solid rgba(255,255,255,0.6);}
+.nav-logo{font-family:'Outfit',sans-serif;font-weight:800;font-size:1.4rem;background:linear-gradient(135deg,var(--warm-gold),var(--coral));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:var(--text-soft);text-decoration:none;font-size:.9rem;font-weight:600;letter-spacing:.05em;transition:color .3s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--coral));transform:scaleX(0);transition:transform .3s;border-radius:2px;}
+.nav-links a:hover{color:var(--coral);}
+.nav-links a:hover::after{transform:scaleX(1);}
+
+#audio-btn{position:fixed;bottom:2rem;right:2rem;z-index:300;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.8);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all .3s;box-shadow:0 4px 20px rgba(0,0,0,.12);}
+#audio-btn:hover{background:rgba(255,255,255,0.75);transform:scale(1.1);}
+#audio-btn.playing{border-color:var(--amber);box-shadow:0 0 24px rgba(245,158,11,.4);}
+
+section{position:relative;z-index:10;}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden;}
+#hud-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;opacity:.18;}
+.city-layer{position:absolute;bottom:0;left:0;width:100%;pointer-events:none;will-change:transform;}
+#city-far{z-index:3;opacity:.28;}
+#city-mid{z-index:4;opacity:.5;}
+#city-near{z-index:5;opacity:.75;}
+#network-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:7;}
+.hero-content{position:relative;z-index:8;text-align:center;max-width:820px;}
+.hero-clock{font-family:'Outfit',monospace;font-size:.78rem;font-weight:600;letter-spacing:.22em;color:var(--coral);opacity:.9;margin-bottom:1.2rem;animation:fadeUp .6s ease .1s both;text-transform:uppercase;}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.8);backdrop-filter:blur(10px);border-radius:50px;padding:.4rem 1.2rem;font-size:.82rem;font-weight:600;color:var(--coral);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2rem;animation:fadeUp .8s ease .2s both;}
+.hero-badge .dot{width:6px;height:6px;background:var(--coral);border-radius:50%;animation:pulse 2s ease infinite;}
+.hero-title{font-family:'Outfit',sans-serif;font-size:clamp(3rem,7vw,6rem);font-weight:800;line-height:1.05;letter-spacing:-.03em;margin-bottom:.5rem;animation:fadeUp .8s ease .4s both;}
+.hero-title .name-first{color:var(--text-main);}
+.hero-title .name-last{background:linear-gradient(135deg,var(--warm-gold),var(--coral),var(--soft-pink));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-role{font-family:'Outfit',sans-serif;font-size:clamp(1.1rem,2.5vw,1.5rem);font-weight:500;color:var(--text-soft);margin-bottom:1.5rem;animation:fadeUp .8s ease .55s both;min-height:2.2rem;}
+.typing-cursor{display:inline-block;width:2px;height:1.1em;background:var(--coral);margin-left:3px;vertical-align:middle;animation:blink .85s step-end infinite;}
+.hero-desc{font-size:1.05rem;line-height:1.75;color:var(--text-soft);max-width:580px;margin:0 auto 2.5rem;animation:fadeUp .8s ease .7s both;}
+.hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;animation:fadeUp .8s ease .85s both;}
+
+/* ══════════════════════════════════════════
+   MAGNETIC BUTTONS
+══════════════════════════════════════════ */
+.btn-primary{display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,var(--amber),var(--coral));color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:.95rem;padding:.85rem 2rem;border-radius:50px;text-decoration:none;transition:transform .15s,box-shadow .2s;box-shadow:0 4px 24px rgba(224,92,26,.4);will-change:transform;}
+.btn-primary:hover{box-shadow:0 8px 36px rgba(224,92,26,.55);}
+.btn-ghost{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.85);backdrop-filter:blur(10px);color:var(--text-main);font-family:'Outfit',sans-serif;font-weight:600;font-size:.95rem;padding:.85rem 2rem;border-radius:50px;text-decoration:none;transition:background .2s,transform .15s;will-change:transform;}
+.btn-ghost:hover{background:rgba(255,255,255,.8);}
+
+.scroll-hint{position:absolute;bottom:4rem;left:50%;transform:translateX(-50%);z-index:8;display:flex;flex-direction:column;align-items:center;gap:.5rem;color:var(--text-soft);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;animation:fadeIn 1s ease 1.5s both;}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--coral),transparent);animation:scrollLine 2s ease infinite;}
+
+.container{max-width:1100px;margin:0 auto;padding:0 2rem;}
+.section-header{text-align:center;margin-bottom:4rem;}
+.section-tag{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--coral);margin-bottom:.75rem;}
+.section-title{font-family:'Outfit',sans-serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;letter-spacing:-.02em;line-height:1.15;color:var(--text-main);}
+.section-title span{background:linear-gradient(135deg,var(--warm-gold),var(--coral));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+
+#about,#experience,#education,#contact{background:rgba(255,255,255,0.25);backdrop-filter:blur(2px);}
+#skills,#projects{background:rgba(200,230,255,0.3);}
+
+/* ABOUT */
+#about{padding:5rem 0;}
+.about-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:4rem;align-items:start;}
+.about-avatar-wrap{position:relative;display:flex;justify-content:center;padding-top:1rem;}
+
+.planet-sphere{width:260px;height:260px;border-radius:50%;position:relative;z-index:2;overflow:hidden;box-shadow:0 12px 60px rgba(0,150,255,.25),inset 0 -20px 40px rgba(0,0,0,.5),inset 0 0 30px rgba(0,200,255,.3);}
+.planet-sphere::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.2) 0%,transparent 60%);z-index:10;pointer-events:none;}
+.planet-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;border-radius:50%;}
+.planet-atmosphere{position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 20px rgba(100,200,255,.5),inset 0 0 40px rgba(50,150,255,.3);z-index:8;pointer-events:none;}
+.planet-initials{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:4.5rem;font-weight:800;z-index:9;color:rgba(255,255,255,.9);letter-spacing:-.02em;text-shadow:0 2px 20px rgba(0,0,0,.7),0 0 30px rgba(0,150,255,.8);}
+.planet-label{text-align:center;margin-top:.8rem;font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(100,200,255,.8);}
+
+.avatar-ring{position:absolute;inset:-12px;border-radius:50%;border:2px solid transparent;background:linear-gradient(135deg,rgba(0,200,255,.5),transparent,var(--coral)) border-box;-webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude;animation:spin 8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.orbit-system{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;}
+.orbit-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px dashed rgba(255,255,255,.3);transform:translate(-50%,-50%);}
+.ring-inner{width:360px;height:360px;animation:ring-spin 18s linear infinite;}
+.ring-inner .orbit-icon{animation:icon-counter-spin 18s linear infinite;}
+.ring-mid{width:480px;height:480px;animation:ring-spin-reverse 26s linear infinite;border:1px dotted rgba(255,255,255,.2);}
+.ring-mid .orbit-icon{animation:icon-spin 26s linear infinite;}
+.ring-outer{width:600px;height:600px;animation:ring-spin 38s linear infinite;border:1px solid rgba(255,255,255,.1);}
+.ring-outer .orbit-icon{animation:icon-counter-spin 38s linear infinite;}
+
+.orbit-icon{position:absolute;width:52px;height:52px;z-index:5;margin-top:-26px;margin-left:-26px;cursor:pointer;}
+.orbit-icon:hover{z-index:15;}
+.orbit-flip-container{position:relative;width:100%;height:100%;perspective:1000px;transition:transform .3s;}
+.orbit-icon:hover .orbit-flip-container{transform:scale(1.35);}
+.orbit-icon-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d;}
+.orbit-icon:hover .orbit-icon-inner{transform:rotateY(180deg);}
+.orbit-icon-front,.orbit-icon-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,.12);background:rgba(255,255,255,.92);border:1.5px solid rgba(255,255,255,.95);backdrop-filter:blur(10px);}
+.orbit-icon:hover .orbit-icon-front,.orbit-icon:hover .orbit-icon-back{box-shadow:0 6px 28px rgba(224,92,26,.35);}
+.orbit-icon-front svg{width:28px;height:28px;}
+.orbit-icon-back{transform:rotateY(180deg);background:rgba(255,255,255,.98);border-color:var(--coral);font-family:'Outfit',sans-serif;font-weight:800;color:var(--coral);font-size:0.62rem;text-transform:uppercase;letter-spacing:.02em;padding:.5rem;}
+
+@keyframes ring-spin{0%{transform:translate(-50%,-50%) rotate(0deg);}100%{transform:translate(-50%,-50%) rotate(360deg);}}
+@keyframes ring-spin-reverse{0%{transform:translate(-50%,-50%) rotate(0deg);}100%{transform:translate(-50%,-50%) rotate(-360deg);}}
+@keyframes icon-spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+@keyframes icon-counter-spin{0%{transform:rotate(0deg);}100%{transform:rotate(-360deg);}}
+
+.ring-inner .icon-1{top:0;left:50%;}
+.ring-inner .icon-2{top:50%;left:100%;}
+.ring-inner .icon-3{top:100%;left:50%;}
+.ring-inner .icon-4{top:50%;left:0;}
+.ring-mid .icon-1{top:5%;left:28%;}
+.ring-mid .icon-2{top:30%;left:95%;}
+.ring-mid .icon-3{top:90%;left:80%;}
+.ring-mid .icon-4{top:90%;left:20%;}
+.ring-mid .icon-5{top:30%;left:5%;}
+.ring-outer .icon-1{top:0;left:50%;}
+.ring-outer .icon-2{top:25%;left:93%;}
+.ring-outer .icon-3{top:75%;left:93%;}
+.ring-outer .icon-4{top:100%;left:50%;}
+.ring-outer .icon-5{top:75%;left:7%;}
+.ring-outer .icon-6{top:25%;left:7%;}
+
+.about-stat-cards{position:absolute;right:-20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:.75rem;z-index:3;}
+.stat-card{background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(12px);border-radius:14px;padding:.75rem 1rem;text-align:center;min-width:90px;box-shadow:0 4px 16px rgba(0,0,0,.1);}
+
+/* ANIMATED STAT NUMBERS */
+.stat-number{font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,var(--warm-gold),var(--coral));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
+.stat-label{font-size:.68rem;color:var(--text-soft);letter-spacing:.05em;text-transform:uppercase;}
+.about-text h3{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:700;margin-bottom:1.25rem;line-height:1.3;color:var(--text-main);}
+.about-text p{color:var(--text-soft);line-height:1.85;margin-bottom:1rem;font-size:.98rem;}
+.about-highlights{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:2rem;}
+.highlight-item{background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.85);backdrop-filter:blur(10px);border-radius:12px;padding:.9rem 1rem;font-size:.85rem;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:transform .3s,box-shadow .3s;}
+.highlight-item:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(224,92,26,.12);}
+.highlight-icon{font-size:1.2rem;margin-bottom:.3rem;display:block;}
+.highlight-title{font-weight:700;color:var(--coral);display:block;margin-bottom:.15rem;font-size:.82rem;}
+.highlight-sub{color:var(--text-soft);font-size:.78rem;}
+
+/* SKILLS */
+#skills{padding:5rem 0;}
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.skill-card{background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.85);backdrop-filter:blur(16px);border-radius:20px;padding:2rem;transition:transform .4s,box-shadow .4s;box-shadow:0 4px 20px rgba(0,0,0,.07);position:relative;overflow:hidden;}
+.skill-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0;opacity:0;transition:opacity .3s;}
+.skill-card:hover{transform:translateY(-6px) rotateX(2deg);box-shadow:0 16px 50px rgba(0,0,0,.12);}
+.skill-card:hover::before{opacity:1;}
+.skill-card:nth-child(1)::before{background:linear-gradient(90deg,#f59e0b,#e05c1a);}
+.skill-card:nth-child(2)::before{background:linear-gradient(90deg,#3b82f6,#8b5cf6);}
+.skill-card:nth-child(3)::before{background:linear-gradient(90deg,#10b981,#059669);}
+.skill-card:nth-child(4)::before{background:linear-gradient(90deg,#f59e0b,#dc2626);}
+.skill-card-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}
+.skill-card-icon{font-size:2rem;}
+.skill-card-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:1.15rem;color:var(--text-main);}
+.skill-card-count{font-size:.8rem;color:var(--text-soft);margin-top:.15rem;}
+.skill-chips{display:flex;flex-wrap:wrap;gap:.5rem;}
+.skill-chip{background:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.95);padding:.4rem .85rem;border-radius:50px;font-size:.8rem;font-weight:600;color:var(--text-soft);transition:all .3s;cursor:pointer;}
+.skill-chip:hover{background:rgba(224,92,26,.1);border-color:var(--coral);color:var(--coral);transform:translateY(-2px);}
+
+/* EXPERIENCE SECTION WITH TRAIN */
+#experience{padding:5rem 0;position:relative;}
+.timeline{position:relative;padding:0 0 0 3rem;}
+.timeline::before{content:'';position:absolute;left:1.5rem;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--coral),var(--amber),var(--soft-pink));border-radius:2px;}
+
+/* STEAM TRAIN ANIMATION */
+.train-container{position:absolute;left:0;top:0;bottom:0;width:3rem;pointer-events:none;z-index:5;}
+.steam-train{position:absolute;left:0.4rem;width:2.2rem;height:2.2rem;animation:trainMove 12s linear infinite;}
+@keyframes trainMove{
+  0%{top:0%;transform:translateY(0);}
+  100%{top:100%;transform:translateY(-2.2rem);}
+}
+
+/* Train SVG styling */
+.train-svg{width:100%;height:100%;filter:drop-shadow(0 2px 6px rgba(0,0,0,.2));}
+
+.timeline-item{position:relative;margin-bottom:3rem;padding-left:2rem;}
+.timeline-dot{position:absolute;left:-2.25rem;top:.5rem;width:1rem;height:1rem;background:linear-gradient(135deg,var(--warm-gold),var(--coral));border-radius:50%;border:3px solid rgba(255,255,255,.95);box-shadow:0 0 0 4px rgba(224,92,26,.15),0 4px 12px rgba(0,0,0,.15);z-index:10;}
+.timeline-card{background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(14px);border-radius:20px;padding:1.75rem 2rem;box-shadow:0 4px 20px rgba(0,0,0,.08);transition:transform .3s,box-shadow .3s;}
+.timeline-card:hover{transform:translateX(8px);box-shadow:0 8px 32px rgba(224,92,26,.12);}
+.tl-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem;}
+.tl-role{font-family:'Outfit',sans-serif;font-weight:700;font-size:1.15rem;color:var(--text-main);}
+.tl-period{font-size:.85rem;color:var(--coral);font-weight:600;background:rgba(245,158,11,.1);padding:.3rem .75rem;border-radius:50px;}
+.tl-company{font-size:.9rem;color:var(--text-soft);margin-bottom:1rem;font-weight:500;}
+.tl-bullets{list-style:none;padding:0;}
+.tl-bullets li{position:relative;padding-left:1.5rem;margin-bottom:.75rem;color:var(--text-soft);font-size:.92rem;line-height:1.65;}
+.tl-bullets li::before{content:'▸';position:absolute;left:0;color:var(--coral);font-weight:700;}
+
+/* PROJECTS */
+#projects{padding:5rem 0;}
+.projects-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+.project-card{background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(16px);border-radius:24px;padding:2.5rem;box-shadow:0 6px 28px rgba(0,0,0,.08);transition:transform .4s,box-shadow .4s;position:relative;overflow:hidden;}
+.project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--amber),var(--coral),var(--soft-pink));opacity:0;transition:opacity .3s;}
+.project-card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 16px 52px rgba(0,0,0,.15);}
+.project-card:hover::before{opacity:1;}
+.project-emoji{font-size:3rem;display:block;margin-bottom:1rem;}
+.project-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:1.35rem;margin-bottom:1rem;color:var(--text-main);line-height:1.3;}
+.project-desc{color:var(--text-soft);line-height:1.75;margin-bottom:1.5rem;font-size:.92rem;}
+.project-tech{display:flex;flex-wrap:wrap;gap:.5rem;}
+.tech-chip{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--coral);padding:.35rem .75rem;border-radius:50px;font-size:.78rem;font-weight:600;}
+
+/* EDUCATION */
+#education{padding:5rem 0;}
+.edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+.edu-card{background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(14px);border-radius:20px;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,.08);transition:transform .3s,box-shadow .3s;position:relative;}
+.edu-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.12);}
+.edu-badge{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border-radius:50px;margin-bottom:1rem;}
+.badge-current{background:linear-gradient(135deg,var(--amber),var(--coral));color:#fff;}
+.badge-completed{background:rgba(100,200,100,.2);color:#059669;border:1px solid rgba(100,200,100,.4);}
+.edu-degree{font-family:'Outfit',sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:.75rem;color:var(--text-main);}
+.edu-school{color:var(--text-soft);font-size:.95rem;margin-bottom:.5rem;}
+.edu-period{font-size:.85rem;color:var(--text-soft);}
+
+/* CONTACT */
+#contact{padding:5rem 0;}
+.contact-wrapper{max-width:700px;margin:0 auto;text-align:center;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(16px);border-radius:28px;padding:3rem;box-shadow:0 8px 36px rgba(0,0,0,.1);}
+.contact-wrapper h3{font-family:'Outfit',sans-serif;font-size:2rem;font-weight:700;margin-bottom:.75rem;color:var(--text-main);}
+.contact-sub{color:var(--text-soft);margin-bottom:2.5rem;font-size:1.05rem;}
+.contact-links{display:flex;flex-direction:column;gap:1rem;}
+.contact-link{display:flex;align-items:center;gap:1.25rem;background:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.95);backdrop-filter:blur(10px);border-radius:16px;padding:1.25rem 1.5rem;text-decoration:none;transition:all .3s;position:relative;}
+.contact-link:hover{background:rgba(255,255,255,.95);border-color:var(--coral);transform:translateX(6px);box-shadow:0 6px 24px rgba(224,92,26,.15);}
+.contact-link-icon{font-size:1.8rem;}
+.contact-link>div{flex:1;text-align:left;}
+.contact-link-label{font-size:.75rem;color:var(--text-soft);text-transform:uppercase;letter-spacing:.08em;font-weight:600;display:block;margin-bottom:.25rem;}
+.contact-link-val{font-size:1rem;color:var(--text-main);font-weight:600;}
+.copy-btn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--coral);padding:.5rem 1.25rem;border-radius:50px;font-size:.8rem;font-weight:600;transition:all .3s;cursor:pointer;}
+.copy-btn:hover{background:rgba(245,158,11,.2);transform:scale(1.05);}
+.copy-btn.copied{background:rgba(100,200,100,.2);color:#059669;border-color:rgba(100,200,100,.4);}
+
+footer{text-align:center;padding:2rem;color:var(--text-soft);font-size:.85rem;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+@keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
+@keyframes scrollLine{0%,20%{transform:translateY(0);opacity:1;}100%{transform:translateY(30px);opacity:0;}}
+
+/* ══════════════════════════════════════════
+   SCROLL REVEAL — SPLIT + STAGGER
+══════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:opacity .7s ease,transform .7s ease;}
+.reveal-left.visible{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(40px);transition:opacity .7s ease,transform .7s ease;}
+.reveal-right.visible{opacity:1;transform:translateX(0);}
+
+/* ══════════════════════════════════════════
+   FLOATING PARTICLES (decorative)
+══════════════════════════════════════════ */
+.float-particle{position:absolute;border-radius:50%;pointer-events:none;animation:floatUp linear infinite;}
+@keyframes floatUp{
+  0%{transform:translateY(0) rotate(0deg);opacity:0;}
+  10%{opacity:1;}
+  90%{opacity:.6;}
+  100%{transform:translateY(-100px) rotate(360deg);opacity:0;}
+}
+
+@media(max-width:768px){
+  .about-grid,.edu-grid{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  .contact-wrapper{padding:2rem;}
+  .hero-cta,.about-stats-row{flex-direction:column;align-items:center;}
+  .skills-grid,.projects-grid{grid-template-columns:1fr;}
+  .ring-inner{width:300px;height:300px;}
+  .ring-mid{width:400px;height:400px;}
+  .ring-outer{width:500px;height:500px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div id="progress-bar"></div>
+
+<!-- Animated mesh background -->
+<div id="mesh-bg"></div>
+
+<!-- Cursor -->
+<div id="cursor-ring"></div>
+<div id="cursor-dot"></div>
+<canvas id="trail-canvas"></canvas>
+
+<button id="audio-btn">🔇</button>
+<canvas id="sky-canvas"></canvas>
+
+<nav>
+  <div class="nav-logo">CK</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <canvas id="hud-canvas"></canvas>
+  <canvas id="network-canvas"></canvas>
+
+  <svg id="city-far" class="city-layer" viewBox="0 0 1440 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <defs><linearGradient id="bF" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a7fa5"/><stop offset="100%" stop-color="#1a3d5c"/></linearGradient></defs>
+    <g fill="url(#bF)">
+      <rect x="0" y="110" width="55" height="110"/><rect x="50" y="130" width="40" height="90"/><rect x="85" y="90" width="45" height="130"/><rect x="125" y="140" width="35" height="80"/><rect x="155" y="70" width="42" height="150"/><rect x="192" y="120" width="50" height="100"/><rect x="237" y="55" width="25" height="165"/><polygon points="249,37 237,65 262,65"/><rect x="257" y="100" width="44" height="120"/><rect x="296" y="128" width="34" height="92"/><rect x="325" y="80" width="52" height="140"/><rect x="372" y="138" width="38" height="82"/><rect x="405" y="48" width="66" height="172"/><rect x="474" y="128" width="58" height="92"/><rect x="527" y="92" width="48" height="128"/><rect x="570" y="138" width="38" height="82"/><rect x="603" y="68" width="55" height="152"/><rect x="652" y="108" width="46" height="112"/><rect x="736" y="78" width="52" height="142"/><rect x="783" y="108" width="35" height="112"/><rect x="813" y="62" width="50" height="158"/><rect x="858" y="128" width="40" height="92"/><rect x="893" y="46" width="50" height="174"/><polygon points="918,28 893,58 943,58"/><rect x="938" y="118" width="46" height="102"/><rect x="979" y="138" width="38" height="82"/><rect x="1012" y="78" width="58" height="142"/><rect x="1065" y="128" width="35" height="92"/><rect x="1095" y="62" width="60" height="158"/><rect x="1150" y="118" width="40" height="102"/><rect x="1185" y="88" width="52" height="132"/><rect x="1232" y="138" width="35" height="82"/><rect x="1262" y="72" width="55" height="148"/><rect x="1312" y="108" width="40" height="112"/><rect x="1347" y="128" width="50" height="92"/><rect x="1392" y="78" width="48" height="142"/>
+    </g>
+  </svg>
+
+  <svg id="city-mid" class="city-layer" viewBox="0 0 1440 260" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <defs><linearGradient id="bM" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2d5f82"/><stop offset="100%" stop-color="#0e2840"/></linearGradient></defs>
+    <g fill="url(#bM)">
+      <rect x="0" y="158" width="72" height="102"/><rect x="67" y="178" width="52" height="82"/><rect x="114" y="128" width="62" height="132"/><rect x="170" y="168" width="42" height="92"/><rect x="207" y="98" width="56" height="162"/><rect x="258" y="152" width="66" height="108"/><rect x="319" y="78" width="36" height="182"/><polygon points="337,56 319,86 355,86"/><rect x="350" y="142" width="59" height="118"/><rect x="404" y="168" width="46" height="92"/><rect x="445" y="112" width="67" height="148"/><rect x="506" y="172" width="49" height="88"/><rect x="550" y="52" width="82" height="208"/><rect x="628" y="138" width="74" height="122"/><rect x="697" y="108" width="59" height="152"/><rect x="751" y="168" width="47" height="92"/><rect x="793" y="82" width="70" height="178"/><rect x="858" y="152" width="57" height="108"/><rect x="910" y="157" width="53" height="103"/><rect x="958" y="126" width="43" height="134"/><rect x="996" y="87" width="64" height="173"/><polygon points="1028,64 996,97 1060,97"/><rect x="1055" y="172" width="51" height="88"/><rect x="1101" y="142" width="45" height="118"/><rect x="1141" y="102" width="68" height="158"/><rect x="1204" y="162" width="43" height="98"/><rect x="1242" y="77" width="72" height="183"/><rect x="1309" y="147" width="49" height="113"/><rect x="1353" y="117" width="57" height="143"/><rect x="1405" y="158" width="35" height="102"/>
+    </g>
+  </svg>
+
+  <svg id="city-near" class="city-layer" viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="bN" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3d5c"/><stop offset="100%" stop-color="#0a1e2e"/></linearGradient>
+      <linearGradient id="hG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f9d89c" stop-opacity="0"/><stop offset="100%" stop-color="#f7c06a" stop-opacity=".4"/></linearGradient>
+    </defs>
+    <rect width="1440" height="120" fill="url(#hG)"/>
+    <g fill="url(#bN)">
+      <rect x="0" y="58" width="92" height="62"/><rect x="87" y="73" width="62" height="47"/><rect x="144" y="43" width="77" height="77"/><rect x="216" y="68" width="52" height="52"/><rect x="263" y="28" width="93" height="92"/><rect x="351" y="63" width="67" height="57"/><rect x="413" y="47" width="83" height="73"/><rect x="491" y="68" width="57" height="52"/><rect x="543" y="17" width="103" height="103"/><rect x="641" y="58" width="72" height="62"/><rect x="708" y="37" width="87" height="83"/><rect x="790" y="63" width="62" height="57"/><rect x="847" y="32" width="93" height="88"/><rect x="935" y="57" width="67" height="63"/><rect x="997" y="42" width="83" height="78"/><rect x="1075" y="68" width="57" height="52"/><rect x="1127" y="22" width="98" height="98"/><rect x="1220" y="58" width="70" height="62"/><rect x="1285" y="40" width="84" height="80"/><rect x="1364" y="62" width="76" height="58"/>
+    </g>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-clock" id="live-clock">Loading...</div>
+    <div class="hero-badge"><span class="dot"></span> Available for opportunities</div>
+    <h1 class="hero-title">
+      <span class="name-first">Chandra Kiran </span><span class="name-last">Suraparaju</span>
+    </h1>
+    <div class="hero-role"><span id="typed-text"></span><span class="typing-cursor"></span></div>
+    <p class="hero-desc">CS Graduate Student at UNC Charlotte with hands-on experience as a Machine Learning Engineer & Software Engineer. Building scalable ML pipelines, full-stack apps, and cloud-deployed automation systems.</p>
+    <div class="hero-cta">
+      <a href="#contact" class="btn-primary magnetic">✉ Get In Touch</a>
+      <a href="#projects" class="btn-ghost magnetic">View My Work →</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><div class="scroll-line"></div><span>Scroll</span></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about"><div class="container">
+  <div class="section-header reveal"><span class="section-tag">🏮 Who I Am</span><h2 class="section-title">About <span>Me</span></h2></div>
+  <div class="about-grid">
+    <div class="about-avatar-wrap reveal-left">
+      <div style="position:relative;display:inline-block;">
+        <div class="orbit-system">
+          <div class="orbit-ring ring-inner">
+            <div class="orbit-icon icon-1" title="Python">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9.585 11.692h4.328s2.432.039 2.432-2.35V5.391S16.714 3 11.887 3C7.1 3 7.1 3 7.1 3L7.092 5.543s-.047 1.668 1.668 1.668h2.674v.622H5.577S3 7.833 3 12.45c0 4.617 2.224 4.464 2.224 4.464h1.327v-1.866s-.08-2.224 2.184-2.224l5.04.004s2.111.033 2.111-2.043v-4.64s.167-2.134-2.645-2.134h-3.03s-1.634-.044-1.634 1.641v3.057c0 .043-.1 1.983 2.008 1.983zm-3.45-7.38a.839.839 0 100-1.678.839.839 0 000 1.678z" fill="#3776AB"/>
+                      <path d="M14.415 12.308h-4.328s-2.432-.039-2.432 2.35v3.951S7.286 21 12.113 21C16.9 21 16.9 21 16.9 21l.008-2.543s.047-1.668-1.668-1.668h-2.674v-.622h5.857S21 16.167 21 11.55c0-4.617-2.224-4.464-2.224-4.464h-1.327v1.866s.08 2.224-2.184 2.224l-5.04-.004s-2.111-.033-2.111 2.043v4.64s-.167 2.134 2.645 2.134h3.03s1.634.044 1.634-1.641v-3.057c0-.043.1-1.983-2.008-1.983zm3.45 7.38a.839.839 0 100 1.678.839.839 0 000-1.678z" fill="#FFC331"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">Python</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-2" title="JavaScript">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="24" height="24" fill="#F7DF1E"/>
+                      <path d="M6.857 20.485c.55 0 .835-.268 1.135-.837l.484-1.142c.087-.208.17-.366.374-.366.171 0 .287.119.287.29v1.695c0 .858-.504 1.375-1.423 1.375-.72 0-1.233-.338-1.59-.991l.645-.536c.183.33.374.512.612.512zm3.384 0c.55 0 .835-.268 1.135-.837l.484-1.142c.087-.208.17-.366.374-.366.171 0 .287.119.287.29v1.695c0 .858-.504 1.375-1.423 1.375-.72 0-1.233-.338-1.59-.991l.645-.536c.183.33.374.512.612.512zm7.142-4.485v3.86c0 1.234-.637 1.64-1.672 1.64-.504 0-.989-.15-1.332-.487l.449-.77c.246.238.52.36.883.36.487 0 .672-.238.672-.77v-3.833h1z" fill="#000"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">JavaScript</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-3" title="SQL">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm6 14c0 1.1-2.69 2-6 2s-6-.9-6-2v-2.23c1.61.78 3.72 1.23 6 1.23s4.39-.45 6-1.23V17zm0-5c0 1.1-2.69 2-6 2s-6-.9-6-2V9.77c1.61.78 3.72 1.23 6 1.23s4.39-.45 6-1.23V12zm-6-4c-3.31 0-6-.9-6-2s2.69-2 6-2 6 .9 6 2-2.69 2-6 2z" fill="#00758F"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">SQL</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-4" title="HTML/CSS">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3.515 3l1.477 16.55L11.987 21l7.005-1.45L20.485 3H3.515zM16.857 7.82H8.342l.188 2.095h8.137l-.562 6.282-3.118.847-3.118-.847-.212-2.377h1.53l.108 1.205 1.692.457 1.693-.457.177-1.981H8.47l-.555-6.216h9.13l-.187 2.093z" fill="#E34F26"/>
+                      <path d="M12 7.82h4.857l-.188 2.095H12v1.875h3.857l-.177 1.982-1.693.457-1.692-.457-.108-1.205H9.657l.212 2.377 3.118.847v-1.93l1.692-.457.177-1.981H12V7.82z" fill="#EF652A"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">HTML/CSS</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="orbit-ring ring-mid">
+            <div class="orbit-icon icon-1" title="React">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 13.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="#61DAFB"/>
+                      <path d="M12 15.5c4.694 0 8.5-1.567 8.5-3.5S16.694 8.5 12 8.5 3.5 10.067 3.5 12s3.806 3.5 8.5 3.5z" stroke="#61DAFB" stroke-width="1.5" fill="none"/>
+                      <path d="M8.75 13.75c2.347 4.067 5.653 6.433 7.382 5.284 1.729-1.149 1.235-5.417-1.112-9.534-2.347-4.067-5.653-6.433-7.382-5.284-1.729 1.149-1.235 5.467 1.112 9.534z" stroke="#61DAFB" stroke-width="1.5" fill="none"/>
+                      <path d="M8.75 10.25c-2.347 4.067-2.841 8.385-1.112 9.534 1.729 1.149 5.035-1.217 7.382-5.284 2.347-4.067 2.841-8.385 1.112-9.534-1.729-1.149-5.035 1.217-7.382 5.284z" stroke="#61DAFB" stroke-width="1.5" fill="none"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">React</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-2" title="scikit-learn">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.18L18.82 8 12 11.82 5.18 8 12 4.18zM5 9.58l6 3.35v6.89l-6-3.35V9.58zm8 10.24v-6.89l6-3.35v6.89l-6 3.35z" fill="#F7931E"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">Scikit</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-3" title="FastAPI">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="10" fill="#009688"/>
+                      <path d="M12 6l-1.5 4.5h-3L10 13l-1.5 4.5L12 15l3.5 2.5L14 13l2.5-2.5h-3L12 6z" fill="#fff"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">FastAPI</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-4" title="TensorFlow">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm5.5 14.5l-5.5 3-5.5-3v-6l5.5-3 5.5 3v6zM12 9l-3 1.73v3.54L12 16l3-1.73v-3.54L12 9z" fill="#FF6F00"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">TensorFlow</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-5" title="Node.js">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2l-10 5.5v11L12 24l10-5.5v-11L12 2zm8 15.5L12 22l-8-4.5v-9L12 4l8 4.5v9z" fill="#339933"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">Node.js</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="orbit-ring ring-outer">
+            <div class="orbit-icon icon-1" title="AWS">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6.76 10.73c0 .43.06.76.17 1.01.13.25.3.54.53.87.06.08.08.16.08.24 0 .1-.06.2-.19.29l-.64.42c-.09.06-.18.09-.26.09-.1 0-.2-.05-.3-.14a3.57 3.57 0 01-.36-.47c-.11-.17-.21-.34-.32-.54-.82.96-1.84 1.44-3.07 1.44-.88 0-1.58-.25-2.1-.75-.52-.5-.78-1.17-.78-2.01 0-.89.32-1.61.95-2.16.64-.55 1.48-.82 2.54-.82.35 0 .72.03 1.1.08.38.05.78.13 1.19.22v-.74c0-.77-.16-1.31-.48-1.62-.33-.31-.88-.47-1.66-.47-.36 0-.72.04-1.1.13-.37.09-.74.2-1.1.33-.16.06-.28.1-.35.12-.07.02-.12.03-.15.03-.14 0-.21-.1-.21-.3v-.47c0-.16.02-.27.07-.35.05-.08.14-.16.28-.24.36-.19.79-.34 1.29-.47.5-.13 1.04-.19 1.61-.19 1.23 0 2.13.28 2.71.83.57.56.86 1.4.86 2.54v3.35zM4.14 13c.34 0 .69-.06 1.07-.19.38-.13.71-.36.99-.7.17-.21.3-.44.37-.71.07-.27.11-.58.11-.94v-.45c-.31-.06-.63-.11-.98-.15-.34-.04-.69-.06-1.03-.06-.73 0-1.27.14-1.61.43-.34.29-.51.7-.51 1.23 0 .51.13.89.38 1.15.25.27.61.4 1.07.4zm10.55 1.39c-.18 0-.3-.03-.38-.1-.08-.06-.15-.2-.22-.39l-2.44-8.04c-.07-.23-.1-.38-.1-.45 0-.18.09-.27.27-.27h1.11c.19 0 .31.03.38.1.08.06.14.2.21.39l1.75 6.9 1.62-6.9c.06-.23.13-.37.21-.39.08-.07.21-.1.39-.1h.9c.19 0 .31.03.39.1.08.06.15.2.21.39l1.64 6.99 1.8-6.99c.07-.23.14-.37.21-.39.08-.07.21-.1.38-.1h1.05c.18 0 .27.09.27.27 0 .05-.01.11-.03.19-.02.08-.05.18-.1.31l-2.51 8.04c-.07.23-.14.37-.22.39-.08.07-.21.1-.38.1h-.97c-.19 0-.31-.03-.39-.1-.08-.07-.15-.2-.21-.4l-1.61-6.72-1.6 6.71c-.06.23-.13.37-.21.4-.08.07-.21.1-.39.1h-.97zm16.76.35c-.64 0-1.28-.07-1.9-.22-.63-.15-1.12-.32-1.46-.52-.19-.11-.32-.24-.37-.36-.05-.12-.08-.25-.08-.39v-.49c0-.2.08-.3.23-.3.06 0 .12.01.18.03.06.02.15.06.27.11.38.17.79.3 1.23.39.45.09.89.13 1.33.13.71 0 1.26-.12 1.64-.37.39-.25.58-.61.58-1.08 0-.32-.1-.59-.31-.8-.21-.22-.6-.42-1.17-.6l-1.68-.53c-.85-.27-1.47-.66-1.87-1.18-.4-.52-.6-1.09-.6-1.72 0-.5.11-.94.33-1.34.22-.4.51-.74.88-1.03.36-.29.78-.51 1.26-.66.48-.15.99-.23 1.52-.23.28 0 .57.02.86.05.29.04.57.09.83.15.26.06.5.13.73.21.23.08.42.16.56.24.15.09.26.19.33.29.07.1.1.23.1.38v.46c0 .2-.08.3-.23.3-.09 0-.23-.04-.42-.13-.64-.28-1.36-.42-2.16-.42-.64 0-1.15.1-1.51.32-.36.22-.54.54-.54 1 0 .32.11.59.34.82.23.23.65.44 1.26.63l1.65.53c.84.27 1.45.64 1.83 1.13.38.49.57 1.05.57 1.69 0 .52-.11.98-.33 1.39-.22.41-.52.77-.9 1.06-.38.3-.82.52-1.33.68-.51.15-1.06.23-1.63.23z" fill="#232F3E"/>
+                      <path d="M19.6 18.78c-3.24 2.39-7.94 3.66-11.99 3.66-5.67 0-10.78-2.1-14.64-5.59-.3-.27-.03-.64.33-.43 4.16 2.42 9.31 3.88 14.63 3.88 3.59 0 7.53-.74 11.16-2.28.55-.23 1.01.36.47.76z" fill="#FF9900"/>
+                      <path d="M20.88 17.26c-.41-.53-2.73-.25-3.77-.13-.32.04-.37-.24-.08-.44 1.85-1.3 4.88-.92 5.23-.49.35.44-.09 3.47-1.82 4.92-.27.23-.52.11-.4-.19.39-.96 1.25-3.13.84-3.67z" fill="#FF9900"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">AWS</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-2" title="Docker">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.98 11.08h2.12a.19.19 0 00.19-.19V9.01a.19.19 0 00-.19-.19h-2.12a.19.19 0 00-.19.19v1.88c0 .1.09.19.19.19zm-2.47 0h2.12a.19.19 0 00.19-.19V9.01a.19.19 0 00-.19-.19h-2.12a.19.19 0 00-.19.19v1.88c0 .1.09.19.19.19zm-2.47 0h2.12a.19.19 0 00.19-.19V9.01a.19.19 0 00-.19-.19H9.04a.19.19 0 00-.19.19v1.88c0 .1.09.19.19.19zm-2.48 0h2.13a.19.19 0 00.19-.19V9.01a.19.19 0 00-.19-.19H6.56a.19.19 0 00-.19.19v1.88c0 .1.09.19.19.19zm0-2.47h2.13a.19.19 0 00.19-.19V6.54a.19.19 0 00-.19-.19H6.56a.19.19 0 00-.19.19v1.88c0 .1.09.19.19.19zm2.47 0h2.12a.19.19 0 00.19-.19V6.54a.19.19 0 00-.19-.19H9.04a.19.19 0 00-.19.19v1.88c0 .1.09.19.19.19z" fill="#0DB7ED"/>
+                      <path d="M13.98 8.61h2.12a.19.19 0 00.19-.19V6.54a.19.19 0 00-.19-.19h-2.12a.19.19 0 00-.19.19v1.88c0 .1.09.19.19.19zm2.47-2.47h2.12a.19.19 0 00.19-.19V4.07a.19.19 0 00-.19-.19h-2.12a.19.19 0 00-.19.19v1.88c0 .1.09.19.19.19z" fill="#0DB7ED"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">Docker</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-3" title="Kubernetes">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 3L3.5 7.5v9L12 21l8.5-4.5v-9L12 3zm0 2.19l6.31 3.31-6.31 3.31-6.31-3.31L12 5.19zM5.69 9.5L12 12.81v6.62l-6.31-3.31V9.5zm12.62 0v6.62L12 19.43v-6.62l6.31-3.31z" fill="#326CE5"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">K8s</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-4" title="Jenkins">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="10" fill="#D24939"/>
+                      <path d="M15 8.5c0-.828-.448-1.5-1-1.5s-1 .672-1 1.5.448 1.5 1 1.5 1-.672 1-1.5zM11 8.5c0-.828-.448-1.5-1-1.5s-1 .672-1 1.5.448 1.5 1 1.5 1-.672 1-1.5zm-3 4c0-.552.448-1 1-1h6c.552 0 1 .448 1 1s-.448 1-1 1H9c-.552 0-1-.448-1-1zm8-1.5h-1v-1h1v1zm-10 0h-1v-1h1v1z" fill="#fff"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">Jenkins</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-5" title="Apache Kafka">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="7" r="2" fill="#231F20"/>
+                      <circle cx="7" cy="15" r="2" fill="#231F20"/>
+                      <circle cx="17" cy="15" r="2" fill="#231F20"/>
+                      <path d="M12 9.5c-1.5 0-2.7 1-3.2 2.4l-1.5-.9c.8-2 2.7-3.5 4.7-3.5s3.9 1.5 4.7 3.5l-1.5.9c-.5-1.4-1.7-2.4-3.2-2.4z" fill="#231F20"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">Kafka</div>
+                </div>
+              </div>
+            </div>
+            <div class="orbit-icon icon-6" title="GCP">
+              <div class="orbit-flip-container">
+                <div class="orbit-icon-inner">
+                  <div class="orbit-icon-front">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12.19 2.38a9.344 9.344 0 00-9.234 6.893c.053-.02-.055.013 0 0-.11.053-.11.137-.219.192-.056.109-.11.218-.164.328-.055.109-.055.218-.11.328a1.861 1.861 0 00-.109.437c-.055.109-.055.218-.055.328-.054.11-.054.163-.054.246 0 .055 0 .163.054.246.055.082.055.191.11.3.054.11.163.22.218.329.11.136.192.218.329.354.027.028.081.055.136.082l.191.082h.055c.027.027.054.027.109.054.11.055.192.055.301.11a.545.545 0 00.41 0c.056-.028.164-.028.22-.055.163-.054.327-.136.49-.218.164-.11.301-.192.438-.329a5.504 5.504 0 00.684-.82c.164-.247.355-.493.52-.739.328-.492.629-1.012.902-1.559a13.877 13.877 0 001.012-3.035c.082-.328.191-.656.246-.984.082-.329.137-.657.191-.985.028-.164.028-.329.055-.493V3.96c0-.082 0-.163.027-.245 0-.164.028-.329.028-.493a.546.546 0 000-.41c-.028-.082-.028-.191-.055-.3-.027-.11-.082-.191-.136-.301-.11-.11-.192-.22-.302-.329-.109-.109-.218-.218-.355-.3-.109-.08-.218-.135-.328-.19a.807.807 0 00-.246-.11.982.982 0 00-.52-.054z" fill="#EA4335"/>
+                      <path d="M23.5 9.943c-.027-.109-.054-.191-.109-.3a2.494 2.494 0 00-.41-.656c-.082-.082-.191-.191-.3-.273-.109-.082-.218-.191-.328-.246-.109-.082-.218-.163-.328-.218-.109-.082-.218-.109-.327-.164-.11-.027-.22-.082-.33-.109-.109-.027-.218-.054-.327-.082-.11 0-.219-.027-.328-.027H12.03c-.055 0-.082.027-.11.027-.082.028-.163.028-.245.055-.082.027-.164.054-.219.109-.082.027-.163.082-.245.11-.164.081-.301.163-.438.272-.136.11-.273.22-.382.356-.109.11-.218.246-.3.383-.082.136-.137.273-.192.41a.92.92 0 00-.054.437c0 .082.027.191.054.3.028.11.055.191.11.301.054.11.136.22.218.329l3.691 3.746c.055.054.082.082.11.136a.28.28 0 00.081.11c.028.054.055.081.082.108.027.055.054.082.054.11.028.054.055.081.055.108 0 .028.027.055.027.082v.054a.547.547 0 010 .274c0 .027 0 .054-.027.082a.199.199 0 00-.055.109c-.027.027-.054.082-.054.109l-.082.082c-.027.027-.054.082-.082.109-.027.027-.054.054-.082.082l-.109.109-3.746 3.8c-.054.056-.109.11-.136.165-.054.054-.082.136-.136.191-.028.082-.055.164-.082.246a.98.98 0 00-.055.3c0 .082 0 .163.028.245 0 .082.027.164.054.246.028.082.055.163.11.245.054.082.109.164.163.219.082.109.164.191.274.3.109.083.218.165.328.22.109.08.218.135.328.19.109.056.218.11.328.137.109.055.218.082.328.109.109.027.218.054.327.082.11.027.219.027.328.027h8.743c.328 0 .684-.054.984-.163.328-.11.629-.247.903-.438.273-.19.519-.41.738-.656.22-.245.41-.52.575-.82.164-.3.3-.629.382-.984.109-.328.163-.684.191-1.04.027-.356.027-.711 0-1.067a4.776 4.776 0 00-.41-1.614c-.11-.273-.246-.52-.41-.765l-3.227-3.117a.098.098 0 01-.027-.054v-.028a.27.27 0 010-.082c0-.027 0-.027.028-.054.027-.028.027-.055.054-.082.027-.027.054-.027.082-.027a.098.098 0 01.054-.028c.028 0 .055 0 .082.028h.027l3.336 3.335c.054.055.109.082.163.11.055.027.11.081.164.108.054.028.136.055.191.082.082.027.163.055.246.055a.95.95 0 00.245 0c.082 0 .164-.028.246-.055.082-.027.163-.082.218-.136.082-.055.164-.11.246-.192.054-.082.136-.163.191-.245.054-.082.082-.191.136-.3.027-.11.027-.191.054-.302v-.027z" fill="#4285F4"/>
+                      <path d="M8.518 13.688c-.027-.027-.027-.027-.054-.054-.028-.028-.055-.028-.082-.055a.098.098 0 00-.055-.027c-.027 0-.054-.028-.082-.028a.098.098 0 00-.054-.027h-.028a.545.545 0 00-.273 0h-.027a.098.098 0 00-.055.027c-.027 0-.054.028-.082.028-.027 0-.027.027-.054.027-.028.027-.055.027-.082.055-.027.027-.027.027-.054.054l-3.063 3.063c-.054.055-.082.11-.136.164a.982.982 0 00-.191.246c-.054.082-.082.191-.109.3-.054.109-.054.218-.054.328 0 .082 0 .191.027.3.028.109.055.191.11.3.054.11.109.192.19.274.083.082.165.191.247.273.082.082.191.164.3.219.11.054.192.109.3.163.11.055.22.082.329.11.109.027.218.054.328.054H9.39c.027 0 .082 0 .109-.027.082 0 .136-.028.218-.028.082-.027.164-.054.246-.109.082-.054.163-.109.218-.163.082-.055.164-.11.219-.192.082-.082.163-.164.218-.273.055-.082.082-.191.11-.273.027-.11.054-.191.054-.301v-3.5c0-.027 0-.054-.027-.082v-.054a.199.199 0 00-.055-.11c0-.027-.027-.054-.054-.081-.028-.028-.028-.055-.055-.082-.027-.027-.027-.055-.054-.082z" fill="#34A853"/>
+                      <path d="M12.03 18.459c.082 0 .164-.027.246-.027.082-.028.163-.028.245-.082.082-.027.164-.082.246-.136.109-.055.191-.11.273-.192.11-.082.192-.163.274-.245.082-.11.163-.219.218-.356.054-.109.109-.218.136-.328.028-.109.055-.218.055-.328v-3.445c0-.109-.027-.218-.055-.328a.862.862 0 00-.136-.328 1.23 1.23 0 00-.218-.355 1.966 1.966 0 00-.793-.438c-.082-.027-.164-.054-.246-.082-.082 0-.163-.027-.245-.027a.545.545 0 00-.274 0 .098.098 0 00-.054.027c-.028 0-.055.028-.082.028-.028 0-.055.027-.055.027-.027.027-.054.027-.082.055-.027.027-.027.027-.054.054l-3.063 3.063c-.054.055-.082.11-.136.164a.982.982 0 00-.191.246c-.054.082-.082.191-.109.3-.055.109-.055.218-.055.328 0 .109 0 .191.028.3.027.109.054.191.109.3.055.11.11.192.191.274.082.082.164.191.246.273.082.082.191.164.3.219.11.054.219.109.301.163.11.055.219.082.328.11.11.027.219.054.328.054h3.446z" fill="#FBBC04"/>
+                    </svg>
+                  </div>
+                  <div class="orbit-icon-back">GCP</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="avatar-ring"></div>
+        <div class="planet-sphere">
+          <canvas class="planet-canvas" id="planet-canvas"></canvas>
+          <div class="planet-atmosphere"></div>
+          <div class="planet-initials">CK</div>
+        </div>
+        <div class="planet-label">🌍 My Universe of Code</div>
+        <div class="about-stat-cards">
+          <div class="stat-card"><div class="stat-number" data-target="2" data-suffix="+">0</div><div class="stat-label">Roles Held</div></div>
+          <div class="stat-card"><div class="stat-number" data-target="15" data-suffix="+">0</div><div class="stat-label">Tech Stack</div></div>
+          <div class="stat-card"><div class="stat-number" data-target="4" data-suffix=".0">0</div><div class="stat-label">GPA</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="about-text reveal-right">
+      <h3>Bridging industry experience<br>with academic excellence</h3>
+      <p>I'm currently pursuing a Master of Science in Computer Science at UNC Charlotte (GPA 4.0), with hands-on experience as an ML Engineer and Software Engineer Intern. I specialize in Python-based ML pipelines, full-stack React applications, and cloud-deployed automation systems.</p>
+      <p>My expertise spans predictive analytics, NLP, scikit-learn, TensorFlow, and cloud deployment using AWS, GCP, and Docker — with a Google Cloud Data Analytics Certificate to back it up.</p>
+      <div class="about-highlights">
+        <div class="highlight-item"><span class="highlight-icon">🎓</span><span class="highlight-title">MSCS Student</span><span class="highlight-sub">4.0 GPA at UNC Charlotte</span></div>
+        <div class="highlight-item"><span class="highlight-icon">💼</span><span class="highlight-title">ML & SWE Experience</span><span class="highlight-sub">Co-op + Internship roles</span></div>
+        <div class="highlight-item"><span class="highlight-icon">🤖</span><span class="highlight-title">AI/ML Focus</span><span class="highlight-sub">scikit-learn, TensorFlow, NLP, CNN</span></div>
+        <div class="highlight-item"><span class="highlight-icon">☁️</span><span class="highlight-title">Cloud Certified</span><span class="highlight-sub">Google Cloud Data Analytics</span></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- SKILLS -->
+<section id="skills"><div class="container">
+  <div class="section-header reveal"><span class="section-tag">✨ Expertise</span><h2 class="section-title">Technical <span>Skills</span></h2></div>
+  <div class="skills-grid">
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-card-icon">⚡</div>
+        <div><div class="skill-card-name">Languages</div><div class="skill-card-count">4 technologies</div></div>
+      </div>
+      <div class="skill-chips">
+        <span class="skill-chip">Python</span><span class="skill-chip">JavaScript</span><span class="skill-chip">SQL</span><span class="skill-chip">HTML/CSS</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-card-icon">🗄️</div>
+        <div><div class="skill-card-name">Databases</div><div class="skill-card-count">4 technologies</div></div>
+      </div>
+      <div class="skill-chips">
+        <span class="skill-chip">PostgreSQL</span><span class="skill-chip">MySQL</span><span class="skill-chip">SQLite</span><span class="skill-chip">Prisma</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-card-icon">🛠️</div>
+        <div><div class="skill-card-name">Frameworks & ML</div><div class="skill-card-count">10+ technologies</div></div>
+      </div>
+      <div class="skill-chips">
+        <span class="skill-chip">React</span><span class="skill-chip">Node.js</span><span class="skill-chip">Fastify</span><span class="skill-chip">Django</span><span class="skill-chip">FastAPI</span><span class="skill-chip">Rasa</span><span class="skill-chip">REST APIs</span><span class="skill-chip">scikit-learn</span><span class="skill-chip">TensorFlow</span><span class="skill-chip">Pandas</span><span class="skill-chip">NumPy</span><span class="skill-chip">OpenCV</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-card-icon">☁️</div>
+        <div><div class="skill-card-name">Cloud & Tools</div><div class="skill-card-count">7 technologies</div></div>
+      </div>
+      <div class="skill-chips">
+        <span class="skill-chip">AWS</span><span class="skill-chip">GCP</span><span class="skill-chip">Docker</span><span class="skill-chip">Kubernetes</span><span class="skill-chip">Jenkins CI/CD</span><span class="skill-chip">Apache Kafka</span><span class="skill-chip">Git</span>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- EXPERIENCE -->
+<section id="experience"><div class="container">
+  <div class="section-header reveal"><span class="section-tag">🌆 Career</span><h2 class="section-title">Professional <span>Experience</span></h2></div>
+  <div class="timeline">
+    <!-- Steam Train Animation -->
+    <div class="train-container">
+      <div class="steam-train">
+        <svg class="train-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <!-- Steam puffs -->
+          <circle cx="20" cy="8" r="4" fill="#E0E0E0" opacity="0.6">
+            <animate attributeName="opacity" values="0.6;0.2;0" dur="1.5s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="8;3" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="25" cy="10" r="3" fill="#E0E0E0" opacity="0.5">
+            <animate attributeName="opacity" values="0.5;0.1;0" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="10;5" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Train body -->
+          <rect x="10" y="28" width="44" height="20" rx="3" fill="#D84315"/>
+          <rect x="14" y="32" width="10" height="12" rx="2" fill="#FFE082"/>
+          <rect x="40" y="32" width="10" height="12" rx="2" fill="#FFE082"/>
+          <!-- Chimney -->
+          <rect x="18" y="18" width="8" height="10" fill="#424242"/>
+          <rect x="16" y="16" width="12" height="4" rx="1" fill="#616161"/>
+          <!-- Cabin -->
+          <rect x="30" y="20" width="14" height="8" fill="#1976D2"/>
+          <!-- Wheels -->
+          <circle cx="20" cy="50" r="6" fill="#424242" stroke="#212121" stroke-width="1.5"/>
+          <circle cx="20" cy="50" r="3" fill="#757575"/>
+          <circle cx="36" cy="50" r="6" fill="#424242" stroke="#212121" stroke-width="1.5"/>
+          <circle cx="36" cy="50" r="3" fill="#757575"/>
+          <circle cx="44" cy="50" r="6" fill="#424242" stroke="#212121" stroke-width="1.5"/>
+          <circle cx="44" cy="50" r="3" fill="#757575"/>
+          <!-- Connecting rods -->
+          <line x1="20" y1="50" x2="36" y2="50" stroke="#9E9E9E" stroke-width="2"/>
+          <line x1="36" y1="50" x2="44" y2="50" stroke="#9E9E9E" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+    
+    <div class="timeline-item reveal"><div class="timeline-dot"></div><div class="timeline-card">
+      <div class="tl-header"><span class="tl-role">Teaching Assistant — Intro to Data Mining</span><span class="tl-period">Jan 2026 – Present</span></div>
+      <div class="tl-company">UNC Charlotte · Charlotte, NC</div>
+      <ul class="tl-bullets">
+        <li>Designed Python-based assignments for 60+ students covering clustering, classification, and model evaluation techniques.</li>
+        <li>Assisted students during labs and office hours in debugging ML workflows using Python and data mining libraries.</li>
+      </ul>
+    </div></div>
+    <div class="timeline-item reveal"><div class="timeline-dot"></div><div class="timeline-card">
+      <div class="tl-header"><span class="tl-role">Machine Learning Engineer (Co-op)</span><span class="tl-period">Jun 2024 – Jul 2025</span></div>
+      <div class="tl-company">EdvenSoft Solutions · Hyderabad, India</div>
+      <ul class="tl-bullets">
+        <li>Developed a Python and scikit-learn ML pipeline to automatically categorize enterprise support tickets, reducing manual triage workload by 40%.</li>
+        <li>Deployed an NLP chatbot using Rasa trained on 2,000+ intents, reducing average query resolution time by 25%.</li>
+        <li>Optimized feature engineering and preprocessing pipelines across multiple ML workflows, improving model efficiency and maintaining production accuracy above 85%.</li>
+        <li>Implemented Jenkins CI/CD pipelines and containerized ML services with Docker on AWS EC2, reducing deployment time from days to hours.</li>
+        <li>Monitored model performance and generated automated reports for stakeholders, improving observability for 3+ enterprise clients.</li>
+      </ul>
+    </div></div>
+    <div class="timeline-item reveal"><div class="timeline-dot"></div><div class="timeline-card">
+      <div class="tl-header"><span class="tl-role">Software Engineer Intern</span><span class="tl-period">May 2023 – Apr 2024</span></div>
+      <div class="tl-company">Amara Raja Energy & Mobility · Tirupati, India</div>
+      <ul class="tl-bullets">
+        <li>Developed Python-based internal tools integrated with SAP ERP, automating supply chain workflows across multiple battery manufacturing units and reducing manual processing time by 30%.</li>
+        <li>Implemented predictive analytics modules to monitor Battery Management System (BMS) health metrics, improving early fault detection and reducing equipment downtime by 20%.</li>
+        <li>Developed a real-time monitoring dashboard using Python and JavaScript for EV charging infrastructure, tracking uptime, energy throughput, and fault alerts across 10+ sites.</li>
+        <li>Containerized internal tools with Docker and deployed across multiple environments, eliminating runtime conflicts and improving developer efficiency.</li>
+        <li>Collaborated in 25+ Agile sprints with cross-functional teams to design, implement, and deliver software features with emphasis on scalability and reliability.</li>
+      </ul>
+    </div></div>
+  </div>
+</div></section>
+
+<!-- PROJECTS -->
+<section id="projects"><div class="container">
+  <div class="section-header reveal"><span class="section-tag">🪟 Work</span><h2 class="section-title">Academic <span>Projects</span></h2></div>
+  <div class="projects-grid">
+    <div class="project-card reveal tilt-card">
+      <span class="project-emoji">♻️</span>
+      <div class="project-title">Eco-Sync: Intelligent Return Engine</div>
+      <p class="project-desc">Built a full-stack return management platform using React and Fastify to streamline product return workflows and automate refund validation. Implemented anomaly detection using Z-score analysis to identify potentially fraudulent return transactions. Developed analytics dashboards to visualize return trends and estimate environmental impact through CO2 savings.</p>
+      <div class="project-tech"><span class="tech-chip">React</span><span class="tech-chip">Fastify</span><span class="tech-chip">Prisma</span><span class="tech-chip">Z-score</span><span class="tech-chip">Node.js</span></div>
+    </div>
+    <div class="project-card reveal tilt-card">
+      <span class="project-emoji">🌾</span>
+      <div class="project-title">Farm Assistant Tool</div>
+      <p class="project-desc">Built a crop recommendation system using scikit-learn trained on 100+ soil and environmental attributes. Developed a CNN-based plant disease classifier using TensorFlow trained on crop leaf image datasets, achieving 87.5% classification accuracy, and integrated predictions into a farmer advisory tool.</p>
+      <div class="project-tech"><span class="tech-chip">Python</span><span class="tech-chip">scikit-learn</span><span class="tech-chip">TensorFlow</span><span class="tech-chip">CNN</span></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- EDUCATION -->
+<section id="education"><div class="container">
+  <div class="section-header reveal"><span class="section-tag">🎓 Learning</span><h2 class="section-title">My <span>Education</span></h2></div>
+  <div class="edu-grid">
+    <div class="edu-card reveal"><span class="edu-badge badge-current">Current</span><div class="edu-degree">Master of Science in Computer Science</div><div class="edu-school">University of North Carolina at Charlotte</div><div class="edu-period">Expected Dec 2026 · GPA 4.0/4.0</div></div>
+    <div class="edu-card reveal"><span class="edu-badge badge-completed">Completed</span><div class="edu-degree">B.E. in Computer Science</div><div class="edu-school">Sri Shakthi Institute of Engineering & Technology, Coimbatore</div><div class="edu-period">2021 – 2025 · GPA 3.8/4.0</div></div>
+  </div>
+</div></section>
+
+<!-- CONTACT -->
+<section id="contact"><div class="container">
+  <div class="section-header reveal"><span class="section-tag">🏮 Connect</span><h2 class="section-title">Get In <span>Touch</span></h2></div>
+  <div class="contact-wrapper reveal">
+    <h3>Let's Build Something Together</h3>
+    <p class="contact-sub">Always open to discussing new opportunities and interesting projects.</p>
+    <div class="contact-links">
+      <a href="mailto:csurapar@charlotte.edu" class="contact-link">
+        <span class="contact-link-icon">✉️</span>
+        <div><span class="contact-link-label">Email</span><span class="contact-link-val">csurapar@charlotte.edu</span></div>
+        <button class="copy-btn" onclick="copyText(event,'csurapar@charlotte.edu',this)">Copy</button>
+      </a>
+      <a href="tel:+19803646953" class="contact-link">
+        <span class="contact-link-icon">📞</span>
+        <div><span class="contact-link-label">Phone</span><span class="contact-link-val">+1 980-364-6953</span></div>
+        <button class="copy-btn" onclick="copyText(event,'+19803646953',this)">Copy</button>
+      </a>
+      <a href="https://www.linkedin.com/in/chandra-kiran01" target="_blank" rel="noopener noreferrer" class="contact-link">
+        <span class="contact-link-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="#0077B5"/>
+          </svg>
+        </span>
+        <div><span class="contact-link-label">LinkedIn</span><span class="contact-link-val">linkedin.com/in/chandra-kiran01</span></div>
+      </a>
+      <a href="#" class="contact-link">
+        <span class="contact-link-icon">📍</span>
+        <div><span class="contact-link-label">Location</span><span class="contact-link-val">Charlotte, NC</span></div>
+      </a>
+    </div>
+  </div>
+</div></section>
+
+<footer><p>© 2026 Chandra Kiran Suraparaju · Crafted with ☀️ San Fransokyo daylight vibes</p></footer>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   SCROLL PROGRESS BAR
+══════════════════════════════════════════════════════ */
+const progressBar = document.getElementById('progress-bar');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docH = document.documentElement.scrollHeight - window.innerHeight;
+  progressBar.style.width = (scrollTop / docH * 100) + '%';
+}, { passive: true });
+
+/* ══════════════════════════════════════════════════════
+   MAGNETIC CURSOR + SPARKLE TRAIL
+══════════════════════════════════════════════════════ */
+const cRing = document.getElementById('cursor-ring');
+const cDot = document.getElementById('cursor-dot');
+const trailCanvas = document.getElementById('trail-canvas');
+const trailCtx = trailCanvas.getContext('2d');
+let mx = -200, my = -200, rx = -200, ry = -200;
+
+function resizeTrail() { trailCanvas.width = window.innerWidth; trailCanvas.height = window.innerHeight; }
+resizeTrail(); window.addEventListener('resize', resizeTrail);
+
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+// Sparkle particles
+const sparks = [];
+function spawnSpark(x, y) {
+  const angle = Math.random() * Math.PI * 2;
+  const speed = Math.random() * 2.5 + 0.5;
+  sparks.push({
+    x, y,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    life: 1,
+    size: Math.random() * 3 + 1,
+    hue: Math.random() * 40 + 15, // amber-coral range
+    decay: Math.random() * 0.04 + 0.025
+  });
+}
+
+let lastSpawnX = 0, lastSpawnY = 0, sparkFrame = 0;
+(function trailLoop() {
+  sparkFrame++;
+  trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+
+  // spawn sparks as mouse moves
+  if (Math.hypot(mx - lastSpawnX, my - lastSpawnY) > 8 && sparkFrame % 2 === 0) {
+    spawnSpark(mx, my);
+    lastSpawnX = mx; lastSpawnY = my;
+  }
+
+  for (let i = sparks.length - 1; i >= 0; i--) {
+    const s = sparks[i];
+    trailCtx.save();
+    trailCtx.globalAlpha = s.life * 0.7;
+    trailCtx.fillStyle = `hsla(${s.hue},90%,65%,1)`;
+    trailCtx.shadowBlur = 6;
+    trailCtx.shadowColor = `hsla(${s.hue},100%,70%,0.8)`;
+    trailCtx.beginPath();
+    trailCtx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
+    trailCtx.fill();
+    trailCtx.restore();
+    s.x += s.vx; s.y += s.vy; s.vy += 0.05;
+    s.life -= s.decay;
+    if (s.life <= 0) sparks.splice(i, 1);
+  }
+
+  // Smooth cursor ring
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  cRing.style.left = rx + 'px'; cRing.style.top = ry + 'px';
+  cDot.style.left = mx + 'px'; cDot.style.top = my + 'px';
+  requestAnimationFrame(trailLoop);
+})();
+
+// Cursor hover states
+document.querySelectorAll('a,button,.skill-chip,.tilt-card,.orbit-icon').forEach(el => {
+  el.addEventListener('mouseenter', () => cRing.classList.add('hovering'));
+  el.addEventListener('mouseleave', () => cRing.classList.remove('hovering'));
+});
+document.addEventListener('mousedown', () => cRing.classList.add('clicking'));
+document.addEventListener('mouseup', () => cRing.classList.remove('clicking'));
+
+/* ══════════════════════════════════════════════════════
+   MAGNETIC BUTTONS
+══════════════════════════════════════════════════════ */
+document.querySelectorAll('.magnetic').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const rect = btn.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) * 0.35;
+    const dy = (e.clientY - cy) * 0.35;
+    btn.style.transform = `translate(${dx}px, ${dy}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = 'translate(0,0)';
+    btn.style.transition = 'transform .4s cubic-bezier(0.25,0.46,0.45,0.94)';
+    setTimeout(() => btn.style.transition = '', 400);
+  });
+});
+
+/* ══════════════════════════════════════════════════════
+   3D TILT CARDS
+══════════════════════════════════════════════════════ */
+document.querySelectorAll('.tilt-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `perspective(800px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(10px)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) translateZ(0)';
+    card.style.transition = 'transform .5s ease';
+    setTimeout(() => card.style.transition = '', 500);
+  });
+  card.addEventListener('mouseenter', () => card.style.transition = 'none');
+});
+
+/* ══════════════════════════════════════════════════════
+   ANIMATED COUNTER NUMBERS
+══════════════════════════════════════════════════════ */
+function animateCounter(el) {
+  const target = parseFloat(el.dataset.target);
+  const suffix = el.dataset.suffix || '+';
+  const duration = 1500;
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(eased * target);
+    el.textContent = current + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+/* ══════════════════════════════════════════════════════
+   SKY (original preserved)
+══════════════════════════════════════════════════════ */
+const sc=document.getElementById('sky-canvas'),sctx=sc.getContext('2d');
+let W,H;
+const lanterns=[],sparksS=[],cloudsS=[];
+function rsS(){W=sc.width=innerWidth;H=sc.height=innerHeight;}
+rsS();window.addEventListener('resize',rsS);
+for(let i=0;i<7;i++) cloudsS.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight*.42+30,w:Math.random()*200+120,h:Math.random()*55+30,speed:Math.random()*.18+.06,alpha:Math.random()*.32+.18});
+function spawnLantern(){lanterns.push({x:Math.random()*W,y:H+40,r:Math.random()*13+7,drift:(Math.random()-.5)*.55,speed:Math.random()*.5+.28,alpha:0,fi:Math.random()*.01+.004,hue:Math.random()*30+18,sway:Math.random()*.8+.3,ss:Math.random()*.02+.008,sp:Math.random()*Math.PI*2});}
+let sf=0,lt=0;
+(function animSky(){
+  sf++;const t=sf;
+  sctx.clearRect(0,0,W,H);
+  const g=sctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#1565a8');g.addColorStop(.35,'#3a9fd8');g.addColorStop(.65,'#7ecef5');g.addColorStop(.85,'#c8e8f8');g.addColorStop(1,'#f9e8c0');
+  sctx.fillStyle=g;sctx.fillRect(0,0,W,H);
+  const sunX=W*.78,sunY=H*.16;
+  const sg=sctx.createRadialGradient(sunX,sunY,0,sunX,sunY,H*.35);
+  sg.addColorStop(0,'rgba(255,248,150,.45)');sg.addColorStop(.3,'rgba(255,220,80,.15)');sg.addColorStop(1,'transparent');
+  sctx.fillStyle=sg;sctx.fillRect(0,0,W,H);
+  const sd=sctx.createRadialGradient(sunX,sunY,0,sunX,sunY,50);
+  sd.addColorStop(0,'rgba(255,255,220,1)');sd.addColorStop(.5,'rgba(255,230,80,.9)');sd.addColorStop(1,'rgba(255,200,50,0)');
+  sctx.fillStyle=sd;sctx.beginPath();sctx.arc(sunX,sunY,50,0,Math.PI*2);sctx.fill();
+  cloudsS.forEach(c=>{
+    c.x+=c.speed;if(c.x>W+c.w+100)c.x=-c.w-100;
+    sctx.save();sctx.globalAlpha=c.alpha;sctx.fillStyle='rgba(255,255,255,0.88)';
+    [0,c.w*.22,c.w*.44,c.w*.66,c.w*.88].forEach((ox,i)=>{const r=c.h*(i===0||i===4?.6:i===2?1:.8),oy=i===2?0:c.h*.18;sctx.beginPath();sctx.arc(c.x+ox,c.y+oy,r,0,Math.PI*2);sctx.fill();});
+    sctx.restore();
+  });
+  lt++;if(lt>90&&lanterns.length<20){spawnLantern();lt=0;}
+  for(let i=lanterns.length-1;i>=0;i--){
+    const l=lanterns[i];l.y-=l.speed;l.x+=l.drift;if(l.alpha<1)l.alpha=Math.min(1,l.alpha+l.fi);if(l.y<-60){lanterns.splice(i,1);continue;}
+    const sx=l.x+Math.sin(t*l.ss+l.sp)*20*l.sway;
+    sctx.save();sctx.globalAlpha=l.alpha*.85;
+    const gg=sctx.createRadialGradient(sx,l.y,0,sx,l.y,l.r*3.5);gg.addColorStop(0,`hsla(${l.hue},90%,65%,.3)`);gg.addColorStop(1,'transparent');sctx.fillStyle=gg;sctx.beginPath();sctx.arc(sx,l.y,l.r*3.5,0,Math.PI*2);sctx.fill();
+    const bg=sctx.createRadialGradient(sx-l.r*.2,l.y-l.r*.15,0,sx,l.y,l.r);bg.addColorStop(0,`hsla(${l.hue+10},100%,78%,1)`);bg.addColorStop(.5,`hsla(${l.hue},90%,58%,1)`);bg.addColorStop(1,`hsla(${l.hue-10},80%,36%,1)`);
+    sctx.fillStyle=bg;sctx.beginPath();sctx.ellipse(sx,l.y,l.r*.72,l.r,0,0,Math.PI*2);sctx.fill();
+    sctx.fillStyle=`hsla(${l.hue-10},65%,32%,${l.alpha})`;sctx.beginPath();sctx.ellipse(sx,l.y-l.r,l.r*.5,l.r*.18,0,0,Math.PI*2);sctx.fill();sctx.beginPath();sctx.ellipse(sx,l.y+l.r,l.r*.5,l.r*.18,0,0,Math.PI*2);sctx.fill();
+    sctx.strokeStyle=`hsla(${l.hue},65%,40%,.45)`;sctx.lineWidth=1;sctx.beginPath();sctx.moveTo(sx,l.y+l.r);sctx.lineTo(sx+Math.sin(t*.02)*4,l.y+l.r+l.r*.9);sctx.stroke();
+    sctx.restore();
+    if(Math.random()<.05)sparksS.push({x:sx+(Math.random()-.5)*l.r,y:l.y+l.r*.5,vx:(Math.random()-.5)*.8,vy:-(Math.random()*1.2+.3),life:1,decay:Math.random()*.016+.01,r:Math.random()*1.5+.4});
+  }
+  for(let i=sparksS.length-1;i>=0;i--){const p=sparksS[i];sctx.save();sctx.globalAlpha=p.life*.7;sctx.fillStyle='#fbbf24';sctx.beginPath();sctx.arc(p.x,p.y,p.r,0,Math.PI*2);sctx.fill();sctx.restore();p.x+=p.vx;p.y+=p.vy;p.life-=p.decay;if(p.life<=0)sparksS.splice(i,1);}
+  requestAnimationFrame(animSky);
+})();
+for(let i=0;i<6;i++)setTimeout(()=>{lanterns.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight*.85,r:Math.random()*13+7,drift:(Math.random()-.5)*.55,speed:Math.random()*.5+.28,alpha:Math.random()*.65,fi:.008,hue:Math.random()*30+18,sway:Math.random()*.8+.3,ss:Math.random()*.02+.008,sp:Math.random()*Math.PI*2});},i*350);
+
+/* HUD GRID */
+const hud=document.getElementById('hud-canvas'),hctx=hud.getContext('2d');
+function rsH(){hud.width=hud.offsetWidth;hud.height=hud.offsetHeight;}rsH();window.addEventListener('resize',rsH);
+(function dH(){
+  hctx.clearRect(0,0,hud.width,hud.height);const W2=hud.width,H2=hud.height;hctx.save();
+  for(let i=0;i<14;i++){const y=H2*.55+(i/13)*H2*.45,a=.03+(i/13)*.14;hctx.strokeStyle=`rgba(20,80,140,${a})`;hctx.lineWidth=.7;hctx.beginPath();hctx.moveTo(0,y);hctx.lineTo(W2,y);hctx.stroke();}
+  const vp={x:W2/2,y:H2*.48};
+  for(let i=0;i<=18;i++){const x=(i/18)*W2,a=.025+Math.abs(.5-i/18)*.14;hctx.strokeStyle=`rgba(20,80,140,${a})`;hctx.lineWidth=.7;hctx.beginPath();hctx.moveTo(vp.x+(x-vp.x)*.05,vp.y);hctx.lineTo(x,H2);hctx.stroke();}
+  hctx.globalAlpha=.38;hctx.strokeStyle='rgba(20,100,180,.6)';hctx.lineWidth=1.5;
+  [[8,8],[W2-8,8],[8,H2-8],[W2-8,H2-8]].forEach(([cx,cy])=>{const sx=cx<W2/2?1:-1,sy=cy<H2/2?1:-1;hctx.beginPath();hctx.moveTo(cx,cy+sy*26);hctx.lineTo(cx,cy);hctx.lineTo(cx+sx*26,cy);hctx.stroke();});
+  hctx.globalAlpha=.5;hctx.fillStyle='rgba(20,80,140,.8)';hctx.font='10px Outfit,monospace';hctx.fillText('SYS:ONLINE',18,H2-14);hctx.fillText('GRID:ACTIVE',W2-96,H2-14);
+  hctx.restore();requestAnimationFrame(dH);
+})();
+
+/* PARALLAX */
+window.addEventListener('scroll',()=>{const s=window.scrollY;document.getElementById('city-far').style.transform=`translateY(${s*.55}px)`;document.getElementById('city-mid').style.transform=`translateY(${s*.32}px)`;document.getElementById('city-near').style.transform=`translateY(${s*.12}px)`;},{passive:true});
+
+/* PARTICLE NETWORK */
+const nc=document.getElementById('network-canvas'),nctx=nc.getContext('2d');
+function rsN(){nc.width=nc.offsetWidth;nc.height=nc.offsetHeight;}rsN();window.addEventListener('resize',rsN);
+const nodes=[];for(let i=0;i<50;i++)nodes.push({x:Math.random()*nc.width,y:Math.random()*nc.height,vx:(Math.random()-.5)*.32,vy:(Math.random()-.5)*.32,r:Math.random()*2+1});
+let nmx=nc.width/2,nmy=nc.height/2;
+document.getElementById('hero').addEventListener('mousemove',e=>{const r=nc.getBoundingClientRect();nmx=e.clientX-r.left;nmy=e.clientY-r.top;});
+(function aN(){
+  nctx.clearRect(0,0,nc.width,nc.height);
+  nodes.forEach(n=>{n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>nc.width)n.vx*=-1;if(n.y<0||n.y>nc.height)n.vy*=-1;});
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<130){nctx.strokeStyle=`rgba(20,80,160,${(1-d/130)*.18})`;nctx.lineWidth=.8;nctx.beginPath();nctx.moveTo(nodes[i].x,nodes[i].y);nctx.lineTo(nodes[j].x,nodes[j].y);nctx.stroke();}}
+    const md=Math.sqrt((nodes[i].x-nmx)**2+(nodes[i].y-nmy)**2);
+    if(md<180){nctx.strokeStyle=`rgba(224,92,26,${(1-md/180)*.45})`;nctx.lineWidth=1;nctx.beginPath();nctx.moveTo(nodes[i].x,nodes[i].y);nctx.lineTo(nmx,nmy);nctx.stroke();}
+    const cl=md<180;const gn=nctx.createRadialGradient(nodes[i].x,nodes[i].y,0,nodes[i].x,nodes[i].y,nodes[i].r*4);gn.addColorStop(0,cl?'rgba(224,92,26,.3)':'rgba(20,100,200,.2)');gn.addColorStop(1,'transparent');nctx.fillStyle=gn;nctx.beginPath();nctx.arc(nodes[i].x,nodes[i].y,nodes[i].r*4,0,Math.PI*2);nctx.fill();
+    nctx.fillStyle=cl?'#e05c1a':'rgba(30,120,220,.7)';nctx.beginPath();nctx.arc(nodes[i].x,nodes[i].y,nodes[i].r,0,Math.PI*2);nctx.fill();
+  }
+  requestAnimationFrame(aN);
+})();
+
+/* CLOCK */
+function tick(){const n=new Date(),d=['SUN','MON','TUE','WED','THU','FRI','SAT'][n.getDay()];document.getElementById('live-clock').textContent=`${d}  ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}  ·  Charlotte, NC`;}
+tick();setInterval(tick,1000);
+
+/* TYPING */
+const roles=['Software Engineer','Graduate Student @ UNCC','Full-Stack Developer','ML Engineer','Automation Specialist'];
+let ri=0,ci=0,del=false;
+function typeIt(){const cur=roles[ri],el=document.getElementById('typed-text');if(!del){el.textContent=cur.slice(0,++ci);if(ci===cur.length){del=true;setTimeout(typeIt,2200);return;}}else{el.textContent=cur.slice(0,--ci);if(ci===0){del=false;ri=(ri+1)%roles.length;setTimeout(typeIt,400);return;}}setTimeout(typeIt,del?45:85);}
+setTimeout(typeIt,1200);
+
+/* AUDIO */
+const aBtn=document.getElementById('audio-btn');let aCtx=null,playing=false;
+function buildAudio(){
+  aCtx=new(window.AudioContext||window.webkitAudioContext)();const master=aCtx.createGain();master.gain.value=.08;master.connect(aCtx.destination);
+  const buf=aCtx.createBuffer(1,aCtx.sampleRate*3,aCtx.sampleRate),data=buf.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1);
+  const ns=aCtx.createBufferSource();ns.buffer=buf;ns.loop=true;const lpf=aCtx.createBiquadFilter();lpf.type='lowpass';lpf.frequency.value=380;const ng=aCtx.createGain();ng.gain.value=.5;ns.connect(lpf);lpf.connect(ng);ng.connect(master);ns.start();
+  [130.8,196,261.6,329.6,392].forEach((f,i)=>{const o=aCtx.createOscillator(),g=aCtx.createGain();o.type='sine';o.frequency.value=f;g.gain.value=0;o.connect(g);g.connect(master);o.start();function pulse(){const now=aCtx.currentTime,per=6+i*2.5;g.gain.setTargetAtTime(.04,now,1.5);setTimeout(()=>g.gain.setTargetAtTime(0,aCtx.currentTime,2),per*500);setTimeout(pulse,per*1000+Math.random()*3000);}setTimeout(pulse,i*1200);});
+  function bell(){const o=aCtx.createOscillator(),g=aCtx.createGain();o.type='sine';o.frequency.value=[523.3,659.3,784,1046.5][Math.floor(Math.random()*4)];g.gain.setValueAtTime(.06,aCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,aCtx.currentTime+2.5);o.connect(g);g.connect(master);o.start();o.stop(aCtx.currentTime+2.5);setTimeout(bell,3000+Math.random()*6000);}bell();
+}
+aBtn.addEventListener('click',()=>{if(!aCtx)buildAudio();if(playing){aCtx.suspend();aBtn.textContent='🔇';aBtn.classList.remove('playing');}else{aCtx.resume();aBtn.textContent='🔊';aBtn.classList.add('playing');}playing=!playing;});
+
+/* ══════════════════════════════════════════════════════
+   SCROLL REVEAL — MULTIPLE DIRECTIONS + COUNTER TRIGGER
+══════════════════════════════════════════════════════ */
+const obs = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) {
+    setTimeout(() => e.target.classList.add('visible'), 80);
+    // trigger counters
+    e.target.querySelectorAll('.stat-number[data-target]').forEach(el => animateCounter(el));
+    obs.unobserve(e.target);
+  }
+}), { threshold: 0.12 });
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => obs.observe(el));
+
+// stagger children inside grids
+document.querySelectorAll('.skills-grid,.projects-grid,.about-highlights,.edu-grid').forEach(grid => {
+  Array.from(grid.children).forEach((child, i) => {
+    child.style.transitionDelay = `${i * 0.1}s`;
+  });
+});
+
+/* ══════════════════════════════════════════════════════
+   COPY BUTTON
+══════════════════════════════════════════════════════ */
+function copyText(e, text, btn) {
+  e.preventDefault(); e.stopPropagation();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   PLANET CANVAS
+══════════════════════════════════════════════════════ */
+(function(){
+  const pc=document.getElementById('planet-canvas');
+  if(!pc)return;
+  const ctx=pc.getContext('2d');
+  const S=260;
+  pc.width=S;pc.height=S;
+  const cx=S/2,cy=S/2,R=S/2;
+  const landmassClusters=[];
+  const biomeColors=['#166534','#15803d','#14532d','#854d0e','#713f12','#a16207'];
+  for(let c=0;c<8;c++){
+    const clusterX=Math.random()*S*2;
+    const clusterY=Math.random()*S*.8+S*.1;
+    const numPieces=Math.floor(Math.random()*5)+4;
+    for(let i=0;i<numPieces;i++){
+      const offsetX=(Math.random()-.5)*40;
+      const offsetY=(Math.random()-.5)*40;
+      landmassClusters.push({x:clusterX+offsetX,y:clusterY+offsetY,size:Math.random()*25+15,color:biomeColors[Math.floor(Math.random()*biomeColors.length)],points:Array.from({length:12},()=>Math.random()*.5+.5)});
+    }
+  }
+  const cities=[];
+  for(let i=0;i<60;i++)cities.push({id:i,x:Math.random()*S*2,y:Math.random()*S*.8+S*.1,size:Math.random()*1.8+1,twinkleSpeed:Math.random()*.06+.02,phase:Math.random()*Math.PI*2,isHub:Math.random()>.8});
+  const routes=[];
+  cities.forEach((c1,i)=>{if(c1.isHub){cities.forEach((c2,j)=>{if(i!==j&&Math.abs(c1.y-c2.y)<60){let dx=Math.min(Math.abs(c1.x-c2.x),Math.abs(c1.x-(c2.x+S*2)),Math.abs(c1.x-(c2.x-S*2)));if(dx>20&&dx<80&&Math.random()>.5){let targetX=c2.x;if(Math.abs(c1.x-(c2.x+S*2))<80)targetX=c2.x+S*2;else if(Math.abs(c1.x-(c2.x-S*2))<80)targetX=c2.x-S*2;routes.push({startX:c1.x,startY:c1.y,endX:targetX,endY:c2.y,controlY:(c1.y+c2.y)/2-(Math.random()*20+10)});}}});}});
+  const planClouds=[];
+  for(let i=0;i<12;i++)planClouds.push({x:Math.random()*S*2,y:Math.random()*S*.9+S*.05,size:Math.random()*25+15,speed:Math.random()*.15+.05,opacity:Math.random()*.3+.1});
+  let offset=0;
+  function drawPlanet(){
+    offset+=.25;if(offset>S)offset-=S;
+    ctx.clearRect(0,0,S,S);ctx.save();
+    ctx.beginPath();ctx.arc(cx,cy,R-1,0,Math.PI*2);ctx.clip();
+    const ocean=ctx.createLinearGradient(0,0,S,S);ocean.addColorStop(0,'#0284c7');ocean.addColorStop(.5,'#0369a1');ocean.addColorStop(1,'#0c4a6e');
+    ctx.fillStyle=ocean;ctx.fillRect(0,0,S,S);
+    ctx.lineWidth=1.5;ctx.lineJoin='round';
+    landmassClusters.forEach(land=>{for(let j=-1;j<=1;j++){const lx=land.x-offset+j*S;if(lx>-land.size&&lx<S+land.size){ctx.beginPath();for(let p=0;p<12;p++){const angle=p*Math.PI/6;const px=lx+Math.cos(angle)*land.size*land.points[p];const py=land.y+Math.sin(angle)*land.size*land.points[p];if(p===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.closePath();ctx.fillStyle=land.color;ctx.fill();ctx.strokeStyle='rgba(0,0,0,0.3)';ctx.stroke();}}});
+    const time=Date.now();
+    const terminatorStart=S*.45,deepNight=S*.7;
+    function getNightFactor(xPos){if(xPos<terminatorStart)return 0;if(xPos>deepNight)return 1;return(xPos-terminatorStart)/(deepNight-terminatorStart);}
+    ctx.lineWidth=1.5;
+    routes.forEach(r=>{for(let j=-1;j<=1;j++){const sx=r.startX-offset+j*S,ex=r.endX-offset+j*S;if(sx>-S&&sx<S*2){const nf=getNightFactor((sx+ex)/2);if(nf>.1){ctx.beginPath();ctx.moveTo(sx,r.startY);ctx.quadraticCurveTo((sx+ex)/2,r.controlY,ex,r.endY);ctx.strokeStyle=`rgba(56,189,248,${nf*.5})`;ctx.stroke();}}}});
+    cities.forEach(city=>{for(let j=-1;j<=1;j++){const cxpos=city.x-offset+j*S;if(cxpos>-city.size*3&&cxpos<S+city.size*3){const nightFactor=getNightFactor(cxpos);if(nightFactor>.1){const twinkle=Math.sin(time*city.twinkleSpeed+city.phase)*.5+.5;const alpha=Math.min(1,(.3+twinkle*.7)*nightFactor);ctx.fillStyle=`rgba(253,224,71,${alpha})`;ctx.beginPath();ctx.arc(cxpos,city.y,city.size,0,Math.PI*2);ctx.fill();const glowR=city.isHub?city.size*4:city.size*2;const glowG=ctx.createRadialGradient(cxpos,city.y,0,cxpos,city.y,glowR);glowG.addColorStop(0,`rgba(250,204,21,${alpha*.5})`);glowG.addColorStop(1,'transparent');ctx.fillStyle=glowG;ctx.beginPath();ctx.arc(cxpos,city.y,glowR,0,Math.PI*2);ctx.fill();}}}});
+    planClouds.forEach(cloud=>{cloud.x+=cloud.speed;if(cloud.x>S*2)cloud.x-=S*2;for(let j=-1;j<=1;j++){const cwx=cloud.x-offset+j*S;if(cwx>-cloud.size&&cwx<S+cloud.size){const nf=getNightFactor(cwx);const cVal=Math.floor(255-(nf*200));ctx.fillStyle=`rgba(${cVal},${cVal},${cVal},${cloud.opacity})`;ctx.beginPath();ctx.arc(cwx,cloud.y,cloud.size,0,Math.PI*2);ctx.arc(cwx+cloud.size*.5,cloud.y-cloud.size*.2,cloud.size*.9,0,Math.PI*2);ctx.arc(cwx-cloud.size*.4,cloud.y+cloud.size*.1,cloud.size*.6,0,Math.PI*2);ctx.fill();}}});
+    const shadow=ctx.createLinearGradient(terminatorStart-20,0,deepNight+20,0);shadow.addColorStop(0,'rgba(0,0,0,0)');shadow.addColorStop(1,'rgba(0,0,0,0.85)');ctx.fillStyle=shadow;ctx.fillRect(0,0,S,S);
+    const rim=ctx.createRadialGradient(cx,cy,R*.85,cx,cy,R);rim.addColorStop(0,'transparent');rim.addColorStop(1,'rgba(0,20,80,.55)');ctx.fillStyle=rim;ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    requestAnimationFrame(drawPlanet);
+  }
+  drawPlanet();
+})();
+</script>
+</body>
+</html>
